@@ -1,39 +1,5 @@
-import {
-    generateStats,
-    updatePlayCountArrAndGetNewMax,
-    StatsType,
-} from "./main";
+import { generateStats, StatsType } from "./main";
 import { TrackDataType } from "./generateData";
-
-describe("Generated stats", () => {
-    it("returns an object with valid shape and correct counts", () => {
-        expect(generateStats([])).toStrictEqual({});
-        expect(generateStats([input1])).toStrictEqual(expected1);
-        expect(generateStats([input2, input22])).toStrictEqual(expected2);
-        expect(generateStats([input1, input2, input22])).toStrictEqual(expected3);
-    });
-});
-
-describe("Helpers functions", () => {
-    test("does not mutate the currentTrack param", () => {
-        const input1: TrackDataType = {
-            name: "Random Name",
-            genre: "Blues",
-            subGenre: "12-bar",
-            playCount: 10,
-            tags: ["slow"],
-        };
-
-        // const expected1: StatsType = {
-        //     totalPlayCountOfAllTracks: 10,
-        //     mostPlayedGenreName: "Blues",
-        //     mostPlayedGenrePlayCount: 10,
-        // };
-
-        // can we test if helper function mutates the currentTrack object ref or contents ?
-        // expect(updatePlayCountArrAndGetNewMax({}, input1)).
-    });
-});
 
 const input1: TrackDataType = {
     name: "Random Name",
@@ -130,3 +96,18 @@ const expected3: StatsType = {
         },
     ],
 };
+
+describe("generateStats", (): void => {
+    it.each`
+    tracks                       | computedStatistics | inputDescription
+    ${[]}                        | ${{}}              | ${"no tracks"}
+    ${[input1]}                  | ${expected1}       | ${"one track"}
+    ${[input2, input22]}         | ${expected2}       | ${"two tracks same genres, diff subgenres"}
+    ${[input1, input2, input22]} | ${expected3}       | ${"three tracks different genres"}
+  `(
+        'returns an object with correctly computed statistics for "$inputDescription"',
+        ({ tracks, computedStatistics }): void => {
+            expect(generateStats(tracks)).toStrictEqual(computedStatistics);
+        }
+    );
+});
