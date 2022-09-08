@@ -25,13 +25,10 @@ export interface StatsType {
 }
 // TODO any runtime validation on the data ? or we assume contract
 
-type playCountArrType = {
-    [key: string]: number;
-};
-
 export function generateStats(tracks: Array<TrackDataType>): StatsType {
     const statsInitialValue: StatsType = {} as StatsType; // TODO: just init the obj here with first entry
-    const playCountArr: playCountArrType = {};
+
+    const playCountPerGenre = new Map<string, number>();
 
     return tracks.reduce((stats: StatsType, track: TrackDataType): StatsType => {
         // total count
@@ -42,7 +39,7 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
                 stats.totalPlayCountOfAllTracks + track.playCount;
         }
         const { mostPlayedGenreName, mostPlayedGenrePlayCount } =
-            updatePlayCountArrAndGetNewMax(playCountArr, track);
+            getMostPlayedGenreAndCount(playCountPerGenre, track);
 
         //TODO test if mutated
         stats.mostPlayedGenreName = mostPlayedGenreName;
@@ -111,39 +108,51 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
     }, statsInitialValue);
 }
 
+type MostPlayedGenreAndCountType = {
+    mostPlayedGenreName: string;
+    mostPlayedGenrePlayCount: number;
+}
+
 /**
- * @modifies {playCountArr}
+ * @modifies {playCountPerGenre}
  */
-export function updatePlayCountArrAndGetNewMax(
-    playCountArrRef: playCountArrType,
+export function getMostPlayedGenreAndCount(
+    playCountPerGenre: Map<string, number>,
     track: TrackDataType
-) {
-    if (playCountArrRef[track.genre] === undefined) {
-        playCountArrRef[track.genre] = track.playCount;
+): MostPlayedGenreAndCountType {
+    const { genre, playCount } = track;
+
+    if (playCountPerGenre.has(genre)) {
+        const currentCount = playCountPerGenre.get(genre);
+        playCountPerGenre.set(genre, currentCount! + playCount);
     } else {
-        playCountArrRef[track.genre] =
-            playCountArrRef[track.genre] + track.playCount;
+        playCountPerGenre.set(genre, playCount);
     }
 
-    let mostPlayedGenreName!: string;
-    let mostPlayedGenrePlayCount!: number;
-    for (const entry in playCountArrRef) {
-        if (
-            mostPlayedGenreName === undefined ||
-            mostPlayedGenrePlayCount === undefined
-        ) {
-            mostPlayedGenreName = entry;
-            mostPlayedGenrePlayCount = playCountArrRef[entry];
-        }
+    return Array.from(playCountPerGenre).reduce(
+        (
+            result: MostPlayedGenreAndCountType,
+            [genre, playCount]
+        ): MostPlayedGenreAndCountType => {
+            if (
+                result.mostPlayedGenreName === undefined ||
+                result.mostPlayedGenrePlayCount === undefined
+            ) {
+                result.mostPlayedGenreName = genre;
+                result.mostPlayedGenrePlayCount = playCount;
 
-        const newValue = playCountArrRef[entry];
+                return result;
+            }
 
-        if (newValue > mostPlayedGenrePlayCount) {
-            mostPlayedGenreName = entry;
-            mostPlayedGenrePlayCount = newValue;
-        }
-    }
-    return { mostPlayedGenreName, mostPlayedGenrePlayCount };
+            if (result.mostPlayedGenrePlayCount < playCount) {
+                result.mostPlayedGenreName = genre;
+                result.mostPlayedGenrePlayCount = playCount;
+            }
+
+            return result;
+        },
+        {} as MostPlayedGenreAndCountType
+    );
 }
 
 const data = generateData(1000);
