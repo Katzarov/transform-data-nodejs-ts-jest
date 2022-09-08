@@ -19,31 +19,31 @@ const genres = [
             { name: "Texas shuffle" },
             { name: "Soul" },
         ],
-        tags: ["slow", "burning", "shuffle", "solos", "very fast", "epic"],
+        tags: ["slow", "burning", "shuffle", "guitar solos", "very fast"],
     },
     {
         name: "Jazz",
         subgenres: [
             { name: "Free Jazz" },
             { name: "Bepop" },
-            { name: "Rock Fusion" },
+            { name: "Jazz - Rock Fusion" },
         ],
-        tags: ["slow", "burning", "shuffle", "solos", "very fast", "epic"],
+        tags: ["drum solos", "sax solos",  "solos", "very fast", "odd time signatures"],
     },
     {
         name: "Rock",
         subgenres: [
             { name: "Classic" },
-            { name: "Jazz Fusion" },
+            { name: "Rock - Jazz Fusion" },
             { name: "Progressive" },
         ],
-        tags: ["slow", "burning", "shuffle", "solos", "very fast", "epic"],
+        tags: ["hard", "guitar solos", "vocal screams", "epic"],
     },
 ];
 
 function generateEntry() {
     const randomGenre = genres.getRandomEntry();
-    const randomSub = randomGenre.subgenres.getRandomEntry();
+    const randomSubGenre = randomGenre.subgenres.getRandomEntry();
 
     const tagsSet: Set<string> = new Set();
     tagsSet.add(randomGenre.tags.getRandomEntry());
@@ -52,11 +52,13 @@ function generateEntry() {
 
     const uniqueTags = [...tagsSet];
 
+    const randomPlayCount = Math.floor(Math.random() * 10000);
+
     return {
         name: "Random Name",
         genre: randomGenre.name,
-        subGenre: randomSub.name,
-        playCount: Math.floor(Math.random() * 10000),
+        subGenre: randomSubGenre.name,
+        playCount: randomPlayCount,
         tags: uniqueTags,
     };
 }
