@@ -37,6 +37,7 @@ describe("Data generator", () => {
       playCount: 0,
       tags: ["slow"],
     };
+    expect(generateData(0).length).toBe(0);
     expect(generateData(3).length).toBe(3);
     expect(generateData(100000).length).toBe(100000);
   });

@@ -82,7 +82,8 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
                 );
 
                 if (subGenreEntryRef) {
-                    subGenreEntryRef.totalPlayCountOfGenre = track.playCount;
+                    subGenreEntryRef.totalPlayCountOfGenre =
+                        subGenreEntryRef.totalPlayCountOfGenre + track.playCount;
                 } else {
                     const newSubGenreEntry: GenreAndSubGenresStatsType = {
                         genre: track.subGenre,
