@@ -28,7 +28,13 @@ const genres = [
             { name: "Bepop" },
             { name: "Jazz - Rock Fusion" },
         ],
-        tags: ["drum solos", "sax solos",  "solos", "very fast", "odd time signatures"],
+        tags: [
+            "drum solos",
+            "sax solos",
+            "solos",
+            "very fast",
+            "odd time signatures",
+        ],
     },
     {
         name: "Rock",
@@ -71,7 +77,13 @@ export interface TrackDataType {
     tags: Array<string>;
 }
 
+/**
+ * @throws {Error}
+ */
 export function generateData(numEntries: number): Array<TrackDataType> {
+    if (numEntries < 0) {
+        throw new Error("Number of entires must be a non-negative number");
+    }
     let data = [];
 
     for (let i = 0; i < numEntries; i++) {
@@ -80,4 +92,18 @@ export function generateData(numEntries: number): Array<TrackDataType> {
     }
 
     return data;
+}
+
+// TODO type promise reject value, typing errors ?
+export async function generateDataAsync(
+    numEntries: number
+): Promise<Array<TrackDataType>> {
+    return new Promise((resolve, reject) => {
+        try {
+            const data = generateData(numEntries);
+            resolve(data);
+        } catch (err) {
+            reject(err);
+        }
+    });
 }

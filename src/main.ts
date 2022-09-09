@@ -27,7 +27,6 @@ export interface StatsType {
 
 export function generateStats(tracks: Array<TrackDataType>): StatsType {
     const statsInitialValue: StatsType = {} as StatsType; // TODO: just init the obj here with first entry
-
     const playCountPerGenre = new Map<string, number>();
 
     return tracks.reduce((stats: StatsType, track: TrackDataType): StatsType => {
@@ -131,25 +130,25 @@ export function getMostPlayedGenreAndCount(
 
     return Array.from(playCountPerGenre).reduce(
         (
-            result: MostPlayedGenreAndCountType,
+            stats: MostPlayedGenreAndCountType,
             [genre, playCount]
         ): MostPlayedGenreAndCountType => {
             if (
-                result.mostPlayedGenreName === undefined ||
-                result.mostPlayedGenrePlayCount === undefined
+                stats.mostPlayedGenreName === undefined ||
+                stats.mostPlayedGenrePlayCount === undefined
             ) {
-                result.mostPlayedGenreName = genre;
-                result.mostPlayedGenrePlayCount = playCount;
+                stats.mostPlayedGenreName = genre;
+                stats.mostPlayedGenrePlayCount = playCount;
 
-                return result;
+                return stats;
             }
 
-            if (result.mostPlayedGenrePlayCount < playCount) {
-                result.mostPlayedGenreName = genre;
-                result.mostPlayedGenrePlayCount = playCount;
+            if (stats.mostPlayedGenrePlayCount < playCount) {
+                stats.mostPlayedGenreName = genre;
+                stats.mostPlayedGenrePlayCount = playCount;
             }
 
-            return result;
+            return stats;
         },
         {} as MostPlayedGenreAndCountType
     );
