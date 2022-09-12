@@ -29,13 +29,11 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
     const playCountPerGenre = new Map<string, number>();
 
     return tracks.reduce((stats: StatsType, track: TrackDataType): StatsType => {
-        // total count
-        if (stats.totalPlayCountOfAllTracks === undefined) {
-            stats.totalPlayCountOfAllTracks = track.playCount;
-        } else {
-            stats.totalPlayCountOfAllTracks =
-                stats.totalPlayCountOfAllTracks + track.playCount;
-        }
+        stats.totalPlayCountOfAllTracks = getTotalPlayCountOfAllTracks(
+            stats,
+            track
+        );
+
         const { mostPlayedGenreName, mostPlayedGenrePlayCount } =
             getMostPlayedGenreAndCount(playCountPerGenre, track);
 
@@ -105,6 +103,25 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
         return stats;
     }, statsInitialValue);
 }
+// TODO: in general, breaking it like that we can test smaller chunks of the code.
+
+// much better to do it in separate funcitons, hepls avoid nesting and we can return early.
+function getTotalPlayCountOfAllTracks(
+    stats: StatsType,
+    track: TrackDataType
+): number {
+    // init case
+    if (stats.totalPlayCountOfAllTracks === undefined) {
+        return track.playCount;
+    }
+
+    return stats.totalPlayCountOfAllTracks + track.playCount;
+}
+
+/**
+ * @modifies {stats}
+ */
+function setGenre(stats: StatsType, track: TrackDataType): void { }
 
 type MostPlayedGenreAndCountType = {
     mostPlayedGenreName: string;
@@ -127,30 +144,36 @@ export function getMostPlayedGenreAndCount(
         playCountPerGenre.set(genre, playCount);
     }
 
+    const mostPlayedInitialValue = {} as MostPlayedGenreAndCountType;
+    // TODO: How do we define the init value..., if I keep it as an empty object or array..
+    // I neeed to do type asseriton as I couldnt figoure out if it can be done any better.
+    // We can also initialize it with the props we expect it to have, so it will correctly typed on teh first iteration.
+    // But then need to do some initialization before the reduce. Not sure which is better.
     return Array.from(playCountPerGenre).reduce(
         (
-            stats: MostPlayedGenreAndCountType,
+            mostPlayed: MostPlayedGenreAndCountType,
             [genre, playCount]
         ): MostPlayedGenreAndCountType => {
-            // first iteration
+            // init case
             if (
-                stats.mostPlayedGenreName === undefined ||
-                stats.mostPlayedGenrePlayCount === undefined
+                // I dont like this. How we are doing hte check.
+                mostPlayed.mostPlayedGenreName === undefined &&
+                mostPlayed.mostPlayedGenrePlayCount === undefined
             ) {
-                stats.mostPlayedGenreName = genre;
-                stats.mostPlayedGenrePlayCount = playCount;
+                mostPlayed.mostPlayedGenreName = genre;
+                mostPlayed.mostPlayedGenrePlayCount = playCount;
 
-                return stats;
+                return mostPlayed;
             }
 
-            if (stats.mostPlayedGenrePlayCount < playCount) {
-                stats.mostPlayedGenreName = genre;
-                stats.mostPlayedGenrePlayCount = playCount;
+            if (mostPlayed.mostPlayedGenrePlayCount < playCount) {
+                mostPlayed.mostPlayedGenreName = genre;
+                mostPlayed.mostPlayedGenrePlayCount = playCount;
             }
 
-            return stats;
+            return mostPlayed;
         },
-        {} as MostPlayedGenreAndCountType
+        mostPlayedInitialValue
     );
 }
 
@@ -158,4 +181,4 @@ const data = generateData(1000);
 // console.log(data);
 
 const stats = generateStats(data);
-// console.log(stats);
+console.log(stats);
