@@ -1,3 +1,5 @@
+// TODO: just experimenting with how to type stuff this
+// would probably not use in prod
 export { };
 declare global {
     interface Array<T> {
@@ -47,7 +49,15 @@ const genres = [
     },
 ];
 
-function generateEntry() {
+export interface TrackDataType {
+    name: string;
+    genre: string;
+    subGenre: string;
+    playCount: number;
+    tags: Array<string>;
+}
+
+function generateEntry(): TrackDataType {
     const randomGenre = genres.getRandomEntry();
     const randomSubGenre = randomGenre.subgenres.getRandomEntry();
 
@@ -69,17 +79,10 @@ function generateEntry() {
     };
 }
 
-export interface TrackDataType {
-    name: string;
-    genre: string;
-    subGenre: string;
-    playCount: number;
-    tags: Array<string>;
-}
-
 /**
  * @throws {Error}
  */
+// TODO: this could throw, how do you type this ?
 export function generateData(numEntries: number): Array<TrackDataType> {
     if (numEntries < 0) {
         throw new Error("Number of entires must be a non-negative number");
@@ -94,7 +97,8 @@ export function generateData(numEntries: number): Array<TrackDataType> {
     return data;
 }
 
-// TODO type promise reject value, typing errors ?
+// TODO: how to properply type this promise, as it could also reject with an Error type.
+// doing a union of Error with TrackDataType didnt seem to be type safe when I tried to use it.
 export async function generateDataAsync(
     numEntries: number
 ): Promise<Array<TrackDataType>> {
