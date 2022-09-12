@@ -8,11 +8,11 @@ import { generateData, TrackDataType } from "./generateData";
 interface GenreStatsType {
     genre: string;
     totalPlayCountOfGenre: number;
-    // tagsStats: Array<TagStatsType>;
+    // tagsStats: Array<TagStatsType>; // will not be implemented
 }
 
-// if we only go so deep, scrap that and just type it more appropriately : nested obj : genre => subgenre
-// this implies we can handle recursiveness but we dont
+// TODO: this implies we can handle infinitely nested genre objects but we dont.
+// should probably just add a subGenres Track to the GenreStatsType and make it optional.
 interface GenreAndSubGenresStatsType extends GenreStatsType {
     subGenres?: Array<GenreAndSubGenresStatsType>;
 }
@@ -23,8 +23,7 @@ export interface StatsType {
     mostPlayedGenrePlayCount: number;
     moreDetailsByGenre: Array<GenreAndSubGenresStatsType>;
 }
-// TODO any runtime validation on the data ? or we assume contract
-
+// TODO: In general, do we do any runtime validation on the fetched data ? or we assume the contract is satisfied.
 export function generateStats(tracks: Array<TrackDataType>): StatsType {
     const statsInitialValue: StatsType = {} as StatsType; // TODO: just init the obj here with first entry
     const playCountPerGenre = new Map<string, number>();
@@ -40,11 +39,11 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
         const { mostPlayedGenreName, mostPlayedGenrePlayCount } =
             getMostPlayedGenreAndCount(playCountPerGenre, track);
 
-        //TODO test if mutated
+        //TODO test, can and should I test if the objects passed to a funciton are mutated when they should not be.
         stats.mostPlayedGenreName = mostPlayedGenreName;
         stats.mostPlayedGenrePlayCount = mostPlayedGenrePlayCount;
 
-        // init case
+        // fist iteration
         const { genre, subGenre, playCount } = track;
 
         if (stats.moreDetailsByGenre === undefined) {
@@ -110,7 +109,7 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
 type MostPlayedGenreAndCountType = {
     mostPlayedGenreName: string;
     mostPlayedGenrePlayCount: number;
-}
+};
 
 /**
  * @modifies {playCountPerGenre}
@@ -133,6 +132,7 @@ export function getMostPlayedGenreAndCount(
             stats: MostPlayedGenreAndCountType,
             [genre, playCount]
         ): MostPlayedGenreAndCountType => {
+            // first iteration
             if (
                 stats.mostPlayedGenreName === undefined ||
                 stats.mostPlayedGenrePlayCount === undefined

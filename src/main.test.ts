@@ -1,6 +1,8 @@
 import { generateStats, StatsType } from "./main";
 import { TrackDataType } from "./generateData";
 
+
+// TODO: see if a better way to produce these objecst used to testing.
 const input1: TrackDataType = {
     name: "Random Name",
     genre: "Blues",
@@ -139,13 +141,12 @@ const expected4: StatsType = {
 
 describe("generateStats", () => {
     it.each`
-    tracks                       | computedStatistics | inputDescription
-    ${[]}                        | ${{}}              | ${"no tracks"}
-    ${[input1]}                  | ${expected1}       | ${"one track"}
-    ${[input2, input22]}         | ${expected2}       | ${"two tracks same genres, diff subgenres"}
-    ${[input1, input2, input22]} | ${expected3}       | ${"three tracks different genres"}
+    tracks                               | computedStatistics | inputDescription
+    ${[]}                                | ${{}}              | ${"no tracks"}
+    ${[input1]}                          | ${expected1}       | ${"one track"}
+    ${[input2, input22]}                 | ${expected2}       | ${"two tracks same genres, diff subgenres"}
+    ${[input1, input2, input22]}         | ${expected3}       | ${"three tracks different genres"}
     ${[input1, input2, input22, input4]} | ${expected4}       | ${"four tracks different genres"}
-
   `(
         'returns an object with correctly computed statistics for "$inputDescription"',
         ({ tracks, computedStatistics }) => {
