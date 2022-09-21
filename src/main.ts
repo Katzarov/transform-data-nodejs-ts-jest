@@ -41,6 +41,9 @@ export function generateStats(tracks: Array<TrackDataType>): StatsType {
         stats.mostPlayedGenreName = mostPlayedGenreName;
         stats.mostPlayedGenrePlayCount = mostPlayedGenrePlayCount;
 
+
+        // TODO Refactor all below to use the setGenre helper function
+        
         // fist iteration
         const { genre, subGenre, playCount } = track;
 
@@ -118,11 +121,6 @@ function getTotalPlayCountOfAllTracks(
     return stats.totalPlayCountOfAllTracks + track.playCount;
 }
 
-/**
- * @modifies {stats}
- */
-function setGenre(stats: StatsType, track: TrackDataType): void { }
-
 type MostPlayedGenreAndCountType = {
     mostPlayedGenreName: string;
     mostPlayedGenrePlayCount: number;
@@ -156,7 +154,7 @@ export function getMostPlayedGenreAndCount(
         ): MostPlayedGenreAndCountType => {
             // init case
             if (
-                // I dont like this. How we are doing hte check.
+                // I dont like this. How we are doing the check.
                 mostPlayed.mostPlayedGenreName === undefined &&
                 mostPlayed.mostPlayedGenrePlayCount === undefined
             ) {
@@ -177,8 +175,49 @@ export function getMostPlayedGenreAndCount(
     );
 }
 
+/**
+ * @modifies {stats}
+ */
+// TODO: finish impl
+function setGenre(
+    stats: StatsType,
+    track: TrackDataType,
+    genreArrayRef?: Array<GenreAndSubGenresStatsType>
+): void {
+    const { genre, subGenre, playCount } = track;
+
+    // @ts-ignore
+    const arr = genreArrayRef ? genreArrayRef : stats.moreDetailsByGenre;
+
+    // check if we already have the same genre name
+    const genreEntryRef = arr.find((entry) => entry.genre === track.genre);
+
+    let newGenreEntry: GenreAndSubGenresStatsType;
+    // if we do, just update total count of genre
+    if (genreEntryRef) {
+        genreEntryRef.totalPlayCountOfGenre =
+            genreEntryRef.totalPlayCountOfGenre + track.playCount;
+    } else {
+        // when not there we need to create a new entry and push it to the arr.
+        newGenreEntry = {
+            genre: genre,
+            totalPlayCountOfGenre: playCount,
+        };
+        arr.push(newGenreEntry);
+    }
+
+    if (subGenre) {
+  
+        // if (newGenreEntry!.subGenres?.length !== 0) {
+        //     return;
+        // }
+        newGenreEntry!.subGenres = [];
+        setGenre(stats, track, newGenreEntry!.subGenres);
+    }
+}
+
 const data = generateData(1000);
 // console.log(data);
 
 const stats = generateStats(data);
-console.log(stats);
+// console.log(stats);
